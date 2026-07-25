@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --background: #020617; /* slate-950 */
+  --foreground: #e2e8f0; /* slate-200 */
+  --accent: #22d3ee; /* cyan-400 */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle grid backdrop (carried from AI Studio export aesthetic) */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Ambient cyan glow */
+.glow-cyan {
+  box-shadow: 0 0 40px -10px rgba(34, 211, 238, 0.35);
+}
+
+.glow-radial {
+  background: radial-gradient(60% 50% at 50% 0%, rgba(34, 211, 238, 0.12), transparent 70%);
+}
+
+/* Thin scrollbar to match dark theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
