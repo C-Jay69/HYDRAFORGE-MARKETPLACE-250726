@@ -5,14 +5,15 @@ import * as schema from "./schema";
 // Reuse a single postgres client across hot-reloads in dev.
 const globalForDb = globalThis as unknown as {
   __pgClient?: ReturnType<typeof postgres>;
+  __db?: ReturnType<typeof drizzle<typeof schema>>;
 };
 
 const connectionString = process.env.DATABASE_URL;
 
-// Lazily create the client so importing this module never throws at build
-// time (Next.js evaluates route modules during `next build` to collect page
-// data, and the DB may not be reachable then). The connection is established
-// on first query instead.
+// Lazily create the postgres-js client so importing this module never throws
+// at build time (Next.js evaluates route modules during `next build` to
+// collect page data, and the DB may not be reachable then). The connection
+// is established on first query instead.
 function getClient() {
   if (!connectionString) {
     throw new Error(
@@ -33,13 +34,27 @@ function getClient() {
   return globalForDb.__pgClient;
 }
 
-// `db` is typed as a Drizzle instance but the underlying client is created
-// lazily on first use via the proxy below.
-const client = new Proxy({} as ReturnType<typeof postgres>, {
-  get(_t, prop) {
-    return getClient()[prop as keyof ReturnType<typeof postgres>];
-  },
-}) as unknown as ReturnType<typeof postgres>;
+// Lazily build the Drizzle instance only when it's actually used. This
+// keeps `import { db } from "@/lib/db"` cheap and side-effect-free at
+// module-load time, which avoids hangs during Turbopack's first compile of
+// pages that touch the DB layer.
+export function getDb() {
+  if (!globalForDb.__db) {
+    globalForDb.__db = drizzle(getClient(), { schema });
+  }
+  return globalForDb.__db;
+}
 
-export const db = drizzle(client, { schema });
+// Convenience re-export so call sites that just want a query handle can do
+// `import { db } from "@/lib/db"` — but note this is a Proxy that defers
+// building the real Drizzle client until the first method call.
+export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
+  get(_target, prop) {
+    // Forward every property access to the lazily-built Drizzle instance.
+    const target = getDb() as unknown as Record<PropertyKey, unknown>;
+    const value = target[prop];
+    return typeof value === "function" ? (value as Function).bind(target) : value;
+  },
+}) as ReturnType<typeof drizzle<typeof schema>>;
+
 export { schema };
