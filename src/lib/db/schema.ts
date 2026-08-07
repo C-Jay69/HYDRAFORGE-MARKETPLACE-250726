@@ -18,6 +18,8 @@ export const categoryEnum = pgEnum("product_category", [
 
 export const statusEnum = pgEnum("product_status", ["draft", "published"]);
 
+export const demoTypeEnum = pgEnum("demo_type", ["none", "iframe", "link"]);
+
 export const billingIntervalEnum = pgEnum("billing_interval", [
   "once",
   "month",
@@ -41,6 +43,8 @@ export const products = pgTable("products", {
   category: categoryEnum("category").notNull().default("other"),
   screenshots: jsonb("screenshots").$type<string[]>().notNull().default([]),
   demoBlurb: text("demo_blurb").notNull().default(""),
+  demoUrl: text("demo_url"),
+  demoType: demoTypeEnum("demo_type").notNull().default("none"),
   externalUrl: text("external_url").notNull(),
   status: statusEnum("status").notNull().default("draft"),
   ownerId: uuid("owner_id"),
