@@ -41,7 +41,7 @@ body {
   background: radial-gradient(60% 50% at 50% 0%, rgba(34, 211, 238, 0.12), transparent 70%);
 }
 
-/* Rotating HYDRAFORGE "H" logo (spin like a coin) */
+/* Rotating HYDRAFORGE "H" logo — 360° clockwise then anticlockwise */
 @keyframes logo-spin {
   from {
     transform: rotateY(0deg);
@@ -51,7 +51,7 @@ body {
   }
 }
 .logo-spin {
-  animation: logo-spin 5s linear infinite;
+  animation: logo-spin 4s ease-in-out infinite alternate;
   transform-style: preserve-3d;
 }
 
