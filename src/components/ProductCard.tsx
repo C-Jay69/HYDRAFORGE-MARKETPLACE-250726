@@ -1,14 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight, Image as ImageIcon } from "lucide-react";
-import type { Product, ProductCategory } from "@/types";
+import type { Product } from "@/types";
 import { priceLabel } from "@/lib/format";
-
-const CATEGORY_LABELS: Record<ProductCategory, string> = {
-  ecommerce: "E-commerce",
-  dating: "Dating",
-  "resume-builder": "Resume Builder",
-  other: "Other",
-};
+import { CATEGORY_LABELS } from "@/lib/categories";
 
 export function ProductCard({ product }: { product: Product }) {
   const thumb = product.screenshots[0];

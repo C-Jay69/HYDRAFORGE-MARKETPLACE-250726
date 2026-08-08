@@ -103,6 +103,11 @@ export async function PATCH(
     patch.demo_url = demoUrl.trim() ? demoUrl : null;
   }
 
+  const demoCredentials = stringField("demo_credentials");
+  if (demoCredentials !== undefined) {
+    patch.demo_credentials = demoCredentials.trim() ? demoCredentials : null;
+  }
+
   const externalUrl = stringField("external_url");
   if (externalUrl !== undefined) {
     if (!externalUrl.trim() || !isValidUrl(externalUrl)) {

@@ -37,9 +37,9 @@ export default async function Home({
             <span className="text-cyan-400"> forged, demoed and for sale.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-slate-400">
-            A marketplace of real, shipping products — e-commerce, dating,
-            resume builders and more. Try the live demos, then buy directly
-            through each seller&apos;s payment portal.
+            A marketplace of real, shipping products — publishing, education,
+            dating, due diligence and more. Try each live demo, then buy
+            directly through the seller&apos;s payment portal.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link

@@ -4,6 +4,11 @@ export const PRODUCT_CATEGORIES = [
   "ecommerce",
   "dating",
   "resume-builder",
+  "publishing",
+  "education",
+  "due-diligence",
+  "parental-monitoring",
+  "social",
   "other",
 ] as const;
 
@@ -29,6 +34,7 @@ export interface Product {
   demo_blurb: string; // placeholder describing the demo
   demo_url: string | null; // optional URL where the product can be tried
   demo_type: DemoType; // how to render the demo: 'none' | 'iframe' | 'link'
+  demo_credentials: string | null; // demo login (e.g. email/password) shown with the demo
   external_url: string; // link to the live app
   status: ProductStatus;
   owner_id: string | null;

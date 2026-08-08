@@ -3,16 +3,11 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Sparkles } from "lucide-react";
 import { getProductBySlug } from "@/lib/products";
 import { ScreenshotGallery } from "@/components/ScreenshotGallery";
+import { DemoCredentials } from "@/components/DemoCredentials";
 import { priceLabel } from "@/lib/format";
+import { CATEGORY_LABELS } from "@/lib/categories";
 
 export const dynamic = "force-dynamic";
-
-const CATEGORY_LABELS: Record<string, string> = {
-  ecommerce: "E-commerce",
-  dating: "Dating",
-  "resume-builder": "Resume Builder",
-  other: "Other",
-};
 
 export default async function ProductPage({
   params,
@@ -91,6 +86,10 @@ export default async function ProductPage({
             </div>
             {product.demo_blurb && (
               <p className="mt-2 text-sm text-slate-400">{product.demo_blurb}</p>
+            )}
+
+            {product.demo_credentials && (
+              <DemoCredentials value={product.demo_credentials} />
             )}
 
             {hasDemo && product.demo_type === "iframe" && (

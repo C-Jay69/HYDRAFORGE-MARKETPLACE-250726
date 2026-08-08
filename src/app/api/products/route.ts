@@ -99,6 +99,8 @@ export async function POST(req: NextRequest) {
         demo_blurb: typeof b.demo_blurb === "string" ? b.demo_blurb : "",
         demo_url: demoUrl || null,
         demo_type: demoType,
+        demo_credentials:
+          typeof b.demo_credentials === "string" ? b.demo_credentials : null,
         external_url: b.external_url as string,
         status: b.status === "published" ? "published" : "draft",
         price_cents: typeof b.price_cents === "number" ? b.price_cents : null,

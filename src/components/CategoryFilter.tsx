@@ -3,14 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Search } from "lucide-react";
-
-const CATEGORIES = [
-  { value: "all", label: "All" },
-  { value: "ecommerce", label: "E-commerce" },
-  { value: "dating", label: "Dating" },
-  { value: "resume-builder", label: "Resume Builder" },
-  { value: "other", label: "Other" },
-];
+import { CATEGORY_FILTER_OPTIONS } from "@/lib/categories";
 
 export function CategoryFilter({
   initialCategory,
@@ -52,7 +45,7 @@ export function CategoryFilter({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2">
-        {CATEGORIES.map((c) => (
+        {CATEGORY_FILTER_OPTIONS.map((c) => (
           <button
             key={c.value}
             onClick={() => {

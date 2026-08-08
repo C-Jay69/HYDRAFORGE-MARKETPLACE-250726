@@ -20,6 +20,7 @@ function rowToProduct(row: ProductRow): Product {
     demo_blurb: row.demoBlurb,
     demo_url: row.demoUrl,
     demo_type: row.demoType,
+    demo_credentials: row.demoCredentials,
     external_url: row.externalUrl,
     status: row.status,
     owner_id: row.ownerId,
@@ -125,6 +126,7 @@ export async function createProduct(
     demoBlurb: input.demo_blurb,
     demoUrl: input.demo_url ?? null,
     demoType: input.demo_type ?? "none",
+    demoCredentials: input.demo_credentials ?? null,
     externalUrl: input.external_url,
     status: input.status ?? "draft",
     ownerId: ownerId ?? null,
@@ -151,6 +153,8 @@ export async function updateProduct(
   if (input.demo_blurb !== undefined) patch.demoBlurb = input.demo_blurb;
   if (input.demo_url !== undefined) patch.demoUrl = input.demo_url;
   if (input.demo_type !== undefined) patch.demoType = input.demo_type;
+  if (input.demo_credentials !== undefined)
+    patch.demoCredentials = input.demo_credentials;
   if (input.external_url !== undefined) patch.externalUrl = input.external_url;
   if (input.status !== undefined) patch.status = input.status;
   if (input.price_cents !== undefined) patch.priceCents = input.price_cents;

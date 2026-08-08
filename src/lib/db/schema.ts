@@ -13,6 +13,11 @@ export const categoryEnum = pgEnum("product_category", [
   "ecommerce",
   "dating",
   "resume-builder",
+  "publishing",
+  "education",
+  "due-diligence",
+  "parental-monitoring",
+  "social",
   "other",
 ]);
 
@@ -45,6 +50,7 @@ export const products = pgTable("products", {
   demoBlurb: text("demo_blurb").notNull().default(""),
   demoUrl: text("demo_url"),
   demoType: demoTypeEnum("demo_type").notNull().default("none"),
+  demoCredentials: text("demo_credentials"),
   externalUrl: text("external_url").notNull(),
   status: statusEnum("status").notNull().default("draft"),
   ownerId: uuid("owner_id"),

@@ -1,19 +1,26 @@
 # HYDRAFORGE Marketplace
 
-A **SaaS marketplace**: browse production apps and platforms (e-commerce, dating,
-resume builders, …), try them via **live demos**, then **buy directly through each
-seller's payment portal**. Anyone who signs up can list their own app for sale —
-with a demo, screenshots, a price, and a link to their payment page.
+A **SaaS marketplace + demo hub**: browse production apps and platforms
+(publishing, education, dating, due diligence, parental monitoring, e-commerce,
+resume builders, …), try them via **live demos** (each with a copyable **demo
+login**), then **buy directly through each seller's payment portal**. Anyone who
+signs up can list their own app for sale — with a demo, screenshots, a price, and
+a link to their payment page.
 
 ## Features
 
 - **Marketplace** (`/`) — public product grid with category filter and search.
 - **Product detail** (`/product/[slug]`) — screenshot gallery, price, a **live
-  demo** (embedded iframe or external demo link), and a **Buy now** button that
-  sends buyers to the seller's payment portal.
+  demo** (embedded iframe or external demo link), a **copyable demo login** for
+  visitors, and a **Buy now** button that sends buyers to the seller's payment
+  portal.
 - **Studio** (`/studio`) — email magic-link sign-in. Every signed-up user can
   create / edit / publish / delete **their own** listings, upload screenshots,
-  set a demo and price, and add a purchase link.
+  set a demo, price, and demo login, and add a purchase link.
+- **Demo hub** — the marketplace doubles as a hub for a portfolio of shipping
+  apps: each one is a published listing whose demo points at the deployed app,
+  with demo credentials visitors can use. Seed your apps with
+  `bun run scripts/seed-apps.ts`.
 
 ## Stack
 
@@ -111,7 +118,29 @@ DATABASE_URL="postgresql://postgres:...@db.YOUR-PROJECT.supabase.co:5432/postgre
 4. The Studio sign-in page now shows a **Continue with Google** button
    alongside the magic link.
 
-### 9. Run it
+### 9. Seed the demo hub (your apps)
+
+The marketplace doubles as a **demo hub** for your portfolio. To publish your
+apps as listings with live-demo links and demo logins:
+
+1. Apply the DB migration (new categories + demo-login column):
+
+   ```bash
+   npx drizzle-kit migrate
+   ```
+
+2. Edit `scripts/seed-apps.ts` — set each app's real **demo URL** and **purchase
+   link** (the file ships with placeholder `*.vercel.app` URLs).
+3. Seed the marketplace:
+
+   ```bash
+   bun run scripts/seed-apps.ts
+   ```
+
+Rerunning is safe (existing slugs are skipped). Visitors see each app's **demo
+login** (copyable) right next to the **Launch demo** button on the product page.
+
+### 10. Run it
 
 ```bash
 npm run dev

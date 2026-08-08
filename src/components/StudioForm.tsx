@@ -4,13 +4,11 @@ import { useState } from "react";
 import { Upload, X, Loader2 } from "lucide-react";
 import type { Product, ProductCategory, DemoType } from "@/types";
 import { CURRENCY_OPTIONS } from "@/lib/format";
+import { CATEGORY_FILTER_OPTIONS } from "@/lib/categories";
 
-const CATEGORY_OPTIONS: { value: ProductCategory; label: string }[] = [
-  { value: "ecommerce", label: "E-commerce" },
-  { value: "dating", label: "Dating" },
-  { value: "resume-builder", label: "Resume Builder" },
-  { value: "other", label: "Other" },
-];
+const CATEGORY_OPTIONS = CATEGORY_FILTER_OPTIONS.filter(
+  (c): c is { value: ProductCategory; label: string } => c.value !== "all"
+);
 
 const DEMO_TYPE_OPTIONS: { value: DemoType; label: string }[] = [
   { value: "iframe", label: "Embedded iframe" },
@@ -38,6 +36,9 @@ export function StudioForm({
     product?.demo_type ?? "none"
   );
   const [demoUrl, setDemoUrl] = useState(product?.demo_url ?? "");
+  const [demoCredentials, setDemoCredentials] = useState(
+    product?.demo_credentials ?? ""
+  );
   const [externalUrl, setExternalUrl] = useState(product?.external_url ?? "");
   const [price, setPrice] = useState(
     product?.price_cents != null
@@ -124,6 +125,7 @@ export function StudioForm({
         demo_blurb: demoBlurb,
         demo_type: demoType,
         demo_url: demoUrl.trim() || null,
+        demo_credentials: demoCredentials.trim() || null,
         external_url: externalUrl,
         status,
         screenshots,
@@ -246,6 +248,21 @@ export function StudioForm({
               placeholder="A quick look at the product…"
             />
           </Field>
+        </div>
+        <div className="mt-5">
+          <Field label="Demo login (shown with the demo)">
+            <textarea
+              value={demoCredentials}
+              onChange={(e) => setDemoCredentials(e.target.value)}
+              rows={2}
+              className={inputCls}
+              placeholder={'demo@hydraforge.tech / demo1234'}
+            />
+          </Field>
+          <p className="mt-2 text-xs text-slate-500">
+            Give visitors a login so they can try the live demo (email / password
+            or magic-link instructions).
+          </p>
         </div>
         <p className="mt-3 text-xs text-slate-500">
           Embedded demos need to allow iframes (no X-Frame-Options block).
