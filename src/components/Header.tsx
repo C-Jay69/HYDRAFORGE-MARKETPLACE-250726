@@ -1,17 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Cpu, LayoutDashboard } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 
 export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center space-x-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-700 p-0.5 shadow-lg shadow-cyan-500/20">
-            <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-slate-950">
-              <Cpu className="h-5 w-5 animate-pulse text-cyan-400" />
-            </div>
+          <div className="h-10 w-10 overflow-hidden rounded-xl bg-white shadow-lg shadow-cyan-500/20">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/hydraforge-logo.webp"
+              alt="HYDRAFORGE logo"
+              className="logo-spin h-full w-full object-cover"
+            />
           </div>
           <div>
             <span className="text-xl font-extrabold tracking-wider text-white">

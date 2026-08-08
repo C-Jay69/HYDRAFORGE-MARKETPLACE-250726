@@ -41,6 +41,20 @@ body {
   background: radial-gradient(60% 50% at 50% 0%, rgba(34, 211, 238, 0.12), transparent 70%);
 }
 
+/* Rotating HYDRAFORGE "H" logo (spin like a coin) */
+@keyframes logo-spin {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+.logo-spin {
+  animation: logo-spin 5s linear infinite;
+  transform-style: preserve-3d;
+}
+
 /* Thin scrollbar to match dark theme */
 ::-webkit-scrollbar {
   width: 10px;
