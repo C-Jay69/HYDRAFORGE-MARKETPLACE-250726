@@ -82,15 +82,36 @@ DATABASE_URL="postgresql://postgres:...@db.YOUR-PROJECT.supabase.co:5432/postgre
 > Uploads are signed server-side with the service-role key, so no client-side RLS
 > policies are needed.
 
-### 7. Enable email magic-link auth
+### 7. Configure auth — URL settings & magic links
 
-1. Supabase → **Authentication → Providers → Email**.
-2. Enable the **Email** provider and save.
-3. Go to **Authentication → URL Configuration → Redirect URLs** and add:
-   - `http://localhost:3000/auth/callback`
-   - `https://your-app.vercel.app/auth/callback` (your production URL, once you deploy)
+> **⚠️ Important:** if the magic link (or OAuth) lands on the wrong app, this is
+> the cause. Magic links fall back to the Supabase **Site URL** when the target
+> URL isn't in the **Redirect URLs** allowlist — so if Site URL points at another
+> app, that's where users end up.
 
-### 8. Run it
+1. Supabase → **Authentication → URL Configuration**:
+   - **Site URL:** `https://your-app.vercel.app` (your production domain — this is
+     the default redirect target).
+   - **Redirect URLs** — add **both**:
+     - `http://localhost:3000/auth/callback`
+     - `https://your-app.vercel.app/auth/callback`
+2. Supabase → **Authentication → Providers → Email** → enable the **Email**
+   provider and save.
+
+### 8. (Optional) Google sign-in
+
+1. In **Google Cloud Console** → create/select an **OAuth 2.0 Client ID**
+   (Web application).
+2. Under **Authorized redirect URIs** add:
+   `https://<your-project-ref>.supabase.co/auth/v1/callback`
+   (the `<project-ref>` is the subdomain of your Supabase URL, e.g. `abcdxyz...`).
+3. In **Supabase → Authentication → Providers → Google**, enable it and paste
+   your **Client ID** and **Client Secret** (these live in the Supabase dashboard,
+   not in the app).
+4. The Studio sign-in page now shows a **Continue with Google** button
+   alongside the magic link.
+
+### 9. Run it
 
 ```bash
 npm run dev
