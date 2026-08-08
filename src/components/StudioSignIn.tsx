@@ -2,15 +2,28 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Mail } from "lucide-react";
+import { Mail, LogIn, UserPlus } from "lucide-react";
+
+type PasswordMode = "signin" | "signup";
 
 export function StudioSignIn() {
+  const router = useRouter();
+  const [method, setMethod] = useState<"password" | "magiclink">("password");
+  const [passwordMode, setPasswordMode] = useState<PasswordMode>("signin");
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState("");
+  const [sentTitle, setSentTitle] = useState("");
+  const [sentBody, setSentBody] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const siteUrl =
+    typeof window !== "undefined"
+      ? (process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin)
+      : "";
 
   async function sendLink(e: React.FormEvent) {
     e.preventDefault();
@@ -21,7 +34,6 @@ export function StudioSignIn() {
     }
     setLoading(true);
     const supabase = createClient();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -32,7 +44,10 @@ export function StudioSignIn() {
     if (error) {
       setError(error.message);
     } else {
-      setSent(true);
+      setSentTitle("Magic link sent");
+      setSentBody(
+        `Check ${email} for your sign-in link. Click it and you'll be signed in automatically.`
+      );
     }
   }
 
@@ -40,7 +55,6 @@ export function StudioSignIn() {
     setError(null);
     setGoogleLoading(true);
     const supabase = createClient();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -54,20 +68,77 @@ export function StudioSignIn() {
     // On success the browser is redirected to Google, so no cleanup needed.
   }
 
-  if (sent) {
+  async function submitPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (!email.includes("@")) {
+      setError("Enter a valid email address.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    setLoading(true);
+    const supabase = createClient();
+
+    if (passwordMode === "signin") {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+      router.push("/studio");
+      router.refresh();
+      return;
+    }
+
+    // Sign up
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${siteUrl}/auth/callback?next=/studio`,
+      },
+    });
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+    if (data.session) {
+      router.push("/studio");
+      router.refresh();
+    } else {
+      setLoading(false);
+      setSentTitle("Confirm your email");
+      setSentBody(
+        `We sent a confirmation link to ${email}. Click it to activate your account, then sign in.`
+      );
+    }
+  }
+
+  if (sentTitle) {
     return (
       <div className="rounded-xl border border-cyan-800/50 bg-cyan-950/30 px-5 py-6 text-center">
         <Mail className="mx-auto h-8 w-8 text-cyan-400" />
-        <p className="mt-3 text-sm text-slate-200">
-          Check <span className="font-semibold text-cyan-300">{email}</span> for
-          your sign-in link.
-        </p>
-        <Link
-          href="/studio"
+        <p className="mt-3 text-sm font-medium text-slate-200">{sentTitle}</p>
+        <p className="mt-1 text-sm text-slate-400">{sentBody}</p>
+        <button
+          type="button"
+          onClick={() => {
+            setSentTitle("");
+            setSentBody("");
+            setLoading(false);
+          }}
           className="mt-4 inline-block text-sm text-slate-400 hover:text-cyan-400"
         >
-          Use a different email
-        </Link>
+          Back to sign in
+        </button>
       </div>
     );
   }
@@ -86,29 +157,108 @@ export function StudioSignIn() {
 
       <div className="flex items-center gap-3 py-1 text-xs text-slate-500">
         <span className="h-px flex-1 bg-slate-800" />
-        or sign in with email
+        or continue with email
         <span className="h-px flex-1 bg-slate-800" />
       </div>
 
-      <form onSubmit={sendLink} className="flex flex-col gap-3">
-        <label className="text-sm text-slate-300">Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className="rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
-        />
-        {error && <p className="text-sm text-red-400">{error}</p>}
+      <div className="grid grid-cols-2 gap-1 rounded-xl border border-slate-800 bg-slate-900/40 p-1">
         <button
-          type="submit"
-          disabled={loading}
-          className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400 disabled:opacity-60"
+          type="button"
+          onClick={() => setMethod("password")}
+          className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            method === "password"
+              ? "bg-slate-800 text-white"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
         >
-          <Mail className="h-4 w-4" />
-          {loading ? "Sending…" : "Send magic link"}
+          Email &amp; password
         </button>
-      </form>
+        <button
+          type="button"
+          onClick={() => setMethod("magiclink")}
+          className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            method === "magiclink"
+              ? "bg-slate-800 text-white"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          Magic link
+        </button>
+      </div>
+
+      {method === "password" ? (
+        <form onSubmit={submitPassword} className="flex flex-col gap-3">
+          <label className="flex flex-col gap-1.5 text-sm text-slate-300">
+            Email
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+            />
+          </label>
+          <label className="flex flex-col gap-1.5 text-sm text-slate-300">
+            Password
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+            />
+          </label>
+          {error && <p className="text-sm text-red-400">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400 disabled:opacity-60"
+          >
+            {passwordMode === "signin" ? (
+              <>
+                <LogIn className="h-4 w-4" />
+                {loading ? "Signing in…" : "Sign in"}
+              </>
+            ) : (
+              <>
+                <UserPlus className="h-4 w-4" />
+                {loading ? "Creating account…" : "Create account"}
+              </>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              setPasswordMode((m) => (m === "signin" ? "signup" : "signin"))
+            }
+            className="text-sm text-slate-400 hover:text-cyan-400"
+          >
+            {passwordMode === "signin"
+              ? "Don't have an account? Create one"
+              : "Already have an account? Sign in"}
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={sendLink} className="flex flex-col gap-3">
+          <label className="text-sm text-slate-300">Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+          />
+          {error && <p className="text-sm text-red-400">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-1 inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400 disabled:opacity-60"
+          >
+            <Mail className="h-4 w-4" />
+            {loading ? "Sending…" : "Send magic link"}
+          </button>
+        </form>
+      )}
     </div>
   );
 }
