@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Product } from "@/types";
+import { priceLabel } from "@/lib/format";
 import { StudioForm } from "./StudioForm";
 
 export function StudioDashboard({
@@ -100,6 +101,7 @@ export function StudioDashboard({
             <tr>
               <th className="px-4 py-3 font-medium">Name</th>
               <th className="px-4 py-3 font-medium">Category</th>
+              <th className="px-4 py-3 font-medium">Price</th>
               <th className="px-4 py-3 font-medium">Status</th>
               <th className="px-4 py-3 text-right font-medium">Actions</th>
             </tr>
@@ -107,7 +109,7 @@ export function StudioDashboard({
           <tbody className="divide-y divide-slate-800">
             {products.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-10 text-center text-slate-500">
+                <td colSpan={5} className="px-4 py-10 text-center text-slate-500">
                   No products yet. Click “New product” to add your first.
                 </td>
               </tr>
@@ -116,6 +118,10 @@ export function StudioDashboard({
               <tr key={p.id} className="hover:bg-slate-900/30">
                 <td className="px-4 py-3 font-medium text-white">{p.name}</td>
                 <td className="px-4 py-3 text-slate-400">{p.category}</td>
+                <td className="px-4 py-3 text-emerald-300">
+                  {priceLabel(p.price_cents, p.currency, p.billing_interval) ??
+                    "—"}
+                </td>
                 <td className="px-4 py-3">
                   <span
                     className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${

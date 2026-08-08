@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HYDRAFORGE — SaaS Showcase Marketplace",
+  title: "HYDRAFORGE — SaaS Marketplace",
   description:
-    "Browse Simon's suite of production SaaS products: e-commerce, dating, resume builders and more. Live demos with a direct link to each app.",
+    "Browse production SaaS products with live demos. Try them out, then buy directly through each seller's payment portal. Sign up to list your own app for sale.",
 };
 
 export default function RootLayout({

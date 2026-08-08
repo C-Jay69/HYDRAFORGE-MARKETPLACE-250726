@@ -4,7 +4,7 @@ import {
   listProducts,
   createProduct,
 } from "@/lib/products";
-import { PRODUCT_CATEGORIES } from "@/types";
+import { PRODUCT_CATEGORIES, DEMO_TYPES, BILLING_INTERVALS } from "@/types";
 
 // GET /api/products?category=ecommerce&q=search
 // Public: returns PUBLISHED products only.
@@ -69,6 +69,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const demoType =
+    typeof b.demo_type === "string" &&
+    (DEMO_TYPES as readonly string[]).includes(b.demo_type)
+      ? (b.demo_type as never)
+      : "none";
+
+  const demoUrl = typeof b.demo_url === "string" ? b.demo_url.trim() : "";
+  if (demoUrl && demoType !== "none") {
+    try {
+      new URL(demoUrl);
+    } catch {
+      return NextResponse.json(
+        { error: "demo_url must be a valid URL." },
+        { status: 400 }
+      );
+    }
+  }
+
   try {
     const product = await createProduct(
       {
@@ -79,13 +97,16 @@ export async function POST(req: NextRequest) {
         category: b.category as never,
         screenshots: Array.isArray(b.screenshots) ? (b.screenshots as string[]) : [],
         demo_blurb: typeof b.demo_blurb === "string" ? b.demo_blurb : "",
+        demo_url: demoUrl || null,
+        demo_type: demoType,
         external_url: b.external_url as string,
         status: b.status === "published" ? "published" : "draft",
         price_cents: typeof b.price_cents === "number" ? b.price_cents : null,
         currency: typeof b.currency === "string" ? b.currency : null,
         billing_interval:
-          b.billing_interval === "once" || b.billing_interval === "month"
-            ? b.billing_interval
+          typeof b.billing_interval === "string" &&
+          (BILLING_INTERVALS as readonly string[]).includes(b.billing_interval)
+            ? (b.billing_interval as never)
             : null,
         stripe_product_id: null,
       },

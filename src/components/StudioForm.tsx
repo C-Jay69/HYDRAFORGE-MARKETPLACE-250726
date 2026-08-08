@@ -2,13 +2,20 @@
 
 import { useState } from "react";
 import { Upload, X, Loader2 } from "lucide-react";
-import type { Product, ProductCategory } from "@/types";
+import type { Product, ProductCategory, DemoType } from "@/types";
+import { CURRENCY_OPTIONS } from "@/lib/format";
 
 const CATEGORY_OPTIONS: { value: ProductCategory; label: string }[] = [
   { value: "ecommerce", label: "E-commerce" },
   { value: "dating", label: "Dating" },
   { value: "resume-builder", label: "Resume Builder" },
   { value: "other", label: "Other" },
+];
+
+const DEMO_TYPE_OPTIONS: { value: DemoType; label: string }[] = [
+  { value: "iframe", label: "Embedded iframe" },
+  { value: "link", label: "External demo link" },
+  { value: "none", label: "No demo" },
 ];
 
 export function StudioForm({
@@ -27,7 +34,20 @@ export function StudioForm({
     product?.category ?? "ecommerce"
   );
   const [demoBlurb, setDemoBlurb] = useState(product?.demo_blurb ?? "");
+  const [demoType, setDemoType] = useState<DemoType>(
+    product?.demo_type ?? "none"
+  );
+  const [demoUrl, setDemoUrl] = useState(product?.demo_url ?? "");
   const [externalUrl, setExternalUrl] = useState(product?.external_url ?? "");
+  const [price, setPrice] = useState(
+    product?.price_cents != null
+      ? String(product.price_cents / 100)
+      : ""
+  );
+  const [currency, setCurrency] = useState(product?.currency ?? "usd");
+  const [billingInterval, setBillingInterval] = useState(
+    product?.billing_interval ?? "once"
+  );
   const [status, setStatus] = useState(product?.status ?? "draft");
   const [screenshots, setScreenshots] = useState<string[]>(
     product?.screenshots ?? []
@@ -65,7 +85,7 @@ export function StudioForm({
         uploaded.push(publicUrl);
       }
       setScreenshots((prev) => [...prev, ...uploaded]);
-    } catch (e) {
+    } catch {
       setError("Screenshot upload failed. Check your connection and retry.");
     } finally {
       setUploading(false);
@@ -76,9 +96,23 @@ export function StudioForm({
     e.preventDefault();
     setError(null);
     if (!name.trim() || !tagline.trim() || !externalUrl.trim()) {
-      setError("Name, tagline and external URL are required.");
+      setError("Name, tagline and purchase link are required.");
       return;
     }
+    if (demoType !== "none" && !demoUrl.trim()) {
+      setError("Add a demo URL, or set the demo type to “No demo”.");
+      return;
+    }
+
+    const priceCents =
+      price.trim() !== ""
+        ? Math.round(parseFloat(price) * 100)
+        : null;
+    if (price.trim() !== "" && (isNaN(priceCents!) || priceCents! < 0)) {
+      setError("Price must be a valid non-negative number.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const payload = {
@@ -88,13 +122,19 @@ export function StudioForm({
         description,
         category,
         demo_blurb: demoBlurb,
+        demo_type: demoType,
+        demo_url: demoUrl.trim() || null,
         external_url: externalUrl,
         status,
         screenshots,
+        price_cents: priceCents,
+        currency: priceCents != null ? currency : null,
+        billing_interval: priceCents != null ? billingInterval : null,
       };
 
-      const res = await fetch("/api/products", {
-        method: "POST",
+      const url = isEdit ? `/api/products/${product.slug}` : "/api/products";
+      const res = await fetch(url, {
+        method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -152,15 +192,6 @@ export function StudioForm({
         </Field>
       </div>
 
-      <Field label="External URL (live app) *">
-        <input
-          value={externalUrl}
-          onChange={(e) => setExternalUrl(e.target.value)}
-          className={inputCls}
-          placeholder="https://myapp.com"
-        />
-      </Field>
-
       <Field label="Description">
         <textarea
           value={description}
@@ -171,13 +202,116 @@ export function StudioForm({
         />
       </Field>
 
-      <Field label="Demo blurb (shown on the listing)">
-        <textarea
-          value={demoBlurb}
-          onChange={(e) => setDemoBlurb(e.target.value)}
-          rows={3}
+      {/* Demo */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-5">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-cyan-400">
+          Demo
+        </h3>
+        <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <Field label="Demo type">
+            <select
+              value={demoType}
+              onChange={(e) => setDemoType(e.target.value as DemoType)}
+              className={inputCls}
+            >
+              {DEMO_TYPE_OPTIONS.map((d) => (
+                <option key={d.value} value={d.value} className="bg-slate-900">
+                  {d.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {demoType !== "none" && (
+            <Field label="Demo URL">
+              <input
+                value={demoUrl}
+                onChange={(e) => setDemoUrl(e.target.value)}
+                className={inputCls}
+                placeholder={
+                  demoType === "iframe"
+                    ? "https://demo.myapp.com"
+                    : "https://myapp.com/demo"
+                }
+              />
+            </Field>
+          )}
+        </div>
+        <div className="mt-5">
+          <Field label="Demo blurb (shown with the demo)">
+            <textarea
+              value={demoBlurb}
+              onChange={(e) => setDemoBlurb(e.target.value)}
+              rows={3}
+              className={inputCls}
+              placeholder="A quick look at the product…"
+            />
+          </Field>
+        </div>
+        <p className="mt-3 text-xs text-slate-500">
+          Embedded demos need to allow iframes (no X-Frame-Options block).
+          Choose an external link if your app can’t be embedded.
+        </p>
+      </div>
+
+      {/* Pricing */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-5">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-cyan-400">
+          Pricing &amp; purchase
+        </h3>
+        <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-3">
+          <Field label="Price (optional)">
+            <input
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              inputMode="decimal"
+              className={inputCls}
+              placeholder="49.00"
+            />
+          </Field>
+          <Field label="Currency">
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              disabled={price.trim() === ""}
+              className={inputCls}
+            >
+              {CURRENCY_OPTIONS.map((c) => (
+                <option key={c.code} value={c.code} className="bg-slate-900">
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Billing">
+            <select
+              value={billingInterval}
+              onChange={(e) =>
+                setBillingInterval(e.target.value as "once" | "month")
+              }
+              disabled={price.trim() === ""}
+              className={inputCls}
+            >
+              <option value="once" className="bg-slate-900">
+                One-time
+              </option>
+              <option value="month" className="bg-slate-900">
+                Monthly
+              </option>
+            </select>
+          </Field>
+        </div>
+        <p className="mt-3 text-xs text-slate-500">
+          Leave the price blank to show “Price on site” — buyers will be
+          directed to your purchase page.
+        </p>
+      </div>
+
+      <Field label="Purchase link (payment portal) *">
+        <input
+          value={externalUrl}
+          onChange={(e) => setExternalUrl(e.target.value)}
           className={inputCls}
-          placeholder="A quick look at the product…"
+          placeholder="https://buy.stripe.com/… or https://myapp.com/checkout"
         />
       </Field>
 
@@ -230,9 +364,6 @@ export function StudioForm({
           />
           Publish (visible on marketplace)
         </label>
-        <span className="text-xs text-slate-500">
-          Payments fields reserved for a future checkout build.
-        </span>
       </div>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
@@ -262,7 +393,7 @@ export function StudioForm({
 }
 
 const inputCls =
-  "w-full rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500";
+  "w-full rounded-xl border border-slate-800 bg-slate-900/40 px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 disabled:opacity-50";
 
 function Field({
   label,

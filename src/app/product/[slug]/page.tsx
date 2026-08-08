@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Sparkles } from "lucide-react";
 import { getProductBySlug } from "@/lib/products";
 import { ScreenshotGallery } from "@/components/ScreenshotGallery";
+import { priceLabel } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,14 @@ export default async function ProductPage({
   const product = await getProductBySlug(slug);
   if (!product || product.status !== "published") notFound();
 
+  const price = priceLabel(
+    product.price_cents,
+    product.currency,
+    product.billing_interval
+  );
+  const hasDemo =
+    product.demo_type !== "none" && !!product.demo_url?.trim();
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <Link
@@ -39,13 +48,40 @@ export default async function ProductPage({
 
         {/* Right: info + actions */}
         <div className="flex flex-col">
-          <span className="w-fit rounded-full border border-cyan-800/60 bg-slate-950/80 px-2.5 py-1 text-[11px] font-medium text-cyan-300">
-            {CATEGORY_LABELS[product.category] ?? product.category}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="w-fit rounded-full border border-cyan-800/60 bg-slate-950/80 px-2.5 py-1 text-[11px] font-medium text-cyan-300">
+              {CATEGORY_LABELS[product.category] ?? product.category}
+            </span>
+            {price && (
+              <span className="w-fit rounded-full border border-emerald-800/60 bg-slate-950/80 px-2.5 py-1 text-[11px] font-medium text-emerald-300">
+                {price}
+              </span>
+            )}
+          </div>
           <h1 className="mt-3 text-3xl font-extrabold text-white">{product.name}</h1>
           <p className="mt-2 text-lg text-slate-300">{product.tagline}</p>
 
-          {/* Demo placeholder block */}
+          {price && (
+            <p className="mt-4 text-2xl font-bold text-white">{price}</p>
+          )}
+
+          {/* Buy CTA — links to the seller's payment portal */}
+          <div className="mt-6 flex flex-col gap-3">
+            <a
+              href={product.external_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3.5 text-base font-semibold text-slate-950 transition-colors hover:bg-emerald-400"
+            >
+              {price ? `Buy now — ${price}` : "Buy now"}
+              <ExternalLink className="h-5 w-5" />
+            </a>
+            <p className="text-center text-xs text-slate-500">
+              Purchases are completed on the seller&apos;s payment portal.
+            </p>
+          </div>
+
+          {/* Demo */}
           <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
             <div className="flex items-center gap-2 text-cyan-400">
               <Sparkles className="h-4 w-4" />
@@ -53,10 +89,47 @@ export default async function ProductPage({
                 Live Demo Preview
               </span>
             </div>
-            <p className="mt-2 text-sm text-slate-400">
-              {product.demo_blurb ||
-                "A quick look at the product. Open the live app to explore the full experience."}
-            </p>
+            {product.demo_blurb && (
+              <p className="mt-2 text-sm text-slate-400">{product.demo_blurb}</p>
+            )}
+
+            {hasDemo && product.demo_type === "iframe" && (
+              <div className="mt-4">
+                <iframe
+                  src={product.demo_url!}
+                  title={`${product.name} live demo`}
+                  className="h-[420px] w-full rounded-xl border border-slate-800 bg-white"
+                  loading="lazy"
+                />
+                <a
+                  href={product.demo_url!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300"
+                >
+                  Open demo in new tab <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            )}
+
+            {hasDemo && product.demo_type === "link" && (
+              <div className="mt-4">
+                <a
+                  href={product.demo_url!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-cyan-800/60 bg-cyan-950/40 px-4 py-2.5 text-sm font-medium text-cyan-300 transition-colors hover:bg-cyan-900/60"
+                >
+                  Launch demo <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
+            )}
+
+            {!hasDemo && (
+              <p className="mt-2 text-sm text-slate-500">
+                No live demo available — head to the product site to explore it.
+              </p>
+            )}
           </div>
 
           {product.description && (
@@ -69,16 +142,6 @@ export default async function ProductPage({
               </p>
             </div>
           )}
-
-          <a
-            href={product.external_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-500 px-6 py-3.5 text-base font-semibold text-slate-950 transition-colors hover:bg-cyan-400"
-          >
-            Visit live app
-            <ExternalLink className="h-5 w-5" />
-          </a>
         </div>
       </div>
     </div>

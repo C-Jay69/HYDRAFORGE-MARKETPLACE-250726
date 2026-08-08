@@ -31,20 +31,26 @@ export default async function Home({
           </div>
           <h1 className="mt-4 max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
             Production SaaS,
-            <span className="text-cyan-400"> forged and live.</span>
+            <span className="text-cyan-400"> forged, demoed and for sale.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-slate-400">
-            A curated showcase of Simon&apos;s shipped products — e-commerce,
-            dating, resume builders and more. Explore the demos, then jump
-            straight to the live app.
+            A marketplace of real, shipping products — e-commerce, dating,
+            resume builders and more. Try the live demos, then buy directly
+            through each seller&apos;s payment portal.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href="/studio"
               className="inline-flex items-center gap-2 rounded-xl border border-cyan-700/50 bg-cyan-500/10 px-5 py-3 text-sm font-semibold text-cyan-300 transition-colors hover:bg-cyan-500/20"
             >
               <Plus className="h-4 w-4" />
-              Add a product
+              Sell your app
+            </Link>
+            <Link
+              href="/studio"
+              className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-slate-300 transition-colors hover:text-white"
+            >
+              Sign up to list your product with a live demo →
             </Link>
           </div>
         </div>

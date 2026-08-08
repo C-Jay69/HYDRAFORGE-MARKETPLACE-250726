@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Image as ImageIcon } from "lucide-react";
 import type { Product, ProductCategory } from "@/types";
+import { priceLabel } from "@/lib/format";
 
 const CATEGORY_LABELS: Record<ProductCategory, string> = {
   ecommerce: "E-commerce",
@@ -11,6 +12,11 @@ const CATEGORY_LABELS: Record<ProductCategory, string> = {
 
 export function ProductCard({ product }: { product: Product }) {
   const thumb = product.screenshots[0];
+  const price = priceLabel(
+    product.price_cents,
+    product.currency,
+    product.billing_interval
+  );
   return (
     <Link
       href={`/product/${product.slug}`}
@@ -40,10 +46,17 @@ export function ProductCard({ product }: { product: Product }) {
           <ArrowUpRight className="h-5 w-5 shrink-0 text-slate-500 transition-colors group-hover:text-cyan-400" />
         </div>
         <p className="line-clamp-2 text-sm text-slate-400">{product.tagline}</p>
-        <span className="mt-auto inline-flex w-fit items-center gap-1 pt-2 text-sm font-medium text-cyan-400">
-          View demo
-          <ArrowUpRight className="h-4 w-4" />
-        </span>
+        <div className="mt-auto flex items-center justify-between pt-2">
+          <span className="inline-flex w-fit items-center gap-1 text-sm font-medium text-cyan-400">
+            View demo
+            <ArrowUpRight className="h-4 w-4" />
+          </span>
+          {price && (
+            <span className="text-sm font-semibold text-emerald-300">
+              {price}
+            </span>
+          )}
+        </div>
       </div>
     </Link>
   );

@@ -21,7 +21,7 @@ export default async function StudioPage({
         <div>
           <h1 className="text-2xl font-extrabold text-white">HYDRAFORGE Studio</h1>
           <p className="mt-1 text-sm text-slate-400">
-            Sign in with your email to manage your SaaS showcase.
+            Sign in with your email to list your apps and demos for sale.
           </p>
         </div>
 
@@ -43,7 +43,7 @@ export default async function StudioPage({
   }
 
   // Signed in -> load all of THIS owner's products (incl. drafts).
-  const products = await listProducts({ includeDrafts: true });
+  const products = await listProducts({ includeDrafts: true, ownerId: user.id });
 
   return <StudioDashboard products={products} email={user.email} />;
 }

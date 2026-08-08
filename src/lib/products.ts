@@ -18,6 +18,8 @@ function rowToProduct(row: ProductRow): Product {
     category: row.category,
     screenshots: row.screenshots ?? [],
     demo_blurb: row.demoBlurb,
+    demo_url: row.demoUrl,
+    demo_type: row.demoType,
     external_url: row.externalUrl,
     status: row.status,
     owner_id: row.ownerId,
@@ -34,6 +36,7 @@ export interface ListOptions {
   category?: ProductCategory | "all";
   q?: string;
   includeDrafts?: boolean; // set true for the owner's Studio view
+  ownerId?: string; // restrict to a single seller's listings
 }
 
 // Public browse: published products only, with optional category + search.
@@ -41,6 +44,9 @@ export async function listProducts(opts: ListOptions = {}): Promise<Product[]> {
   const conditions = [];
   if (!opts.includeDrafts) {
     conditions.push(eq(products.status, "published"));
+  }
+  if (opts.ownerId) {
+    conditions.push(eq(products.ownerId, opts.ownerId));
   }
   if (opts.category && opts.category !== "all") {
     conditions.push(eq(products.category, opts.category));
@@ -117,6 +123,8 @@ export async function createProduct(
     category: input.category,
     screenshots: input.screenshots ?? [],
     demoBlurb: input.demo_blurb,
+    demoUrl: input.demo_url ?? null,
+    demoType: input.demo_type ?? "none",
     externalUrl: input.external_url,
     status: input.status ?? "draft",
     ownerId: ownerId ?? null,
@@ -141,6 +149,8 @@ export async function updateProduct(
   if (input.category !== undefined) patch.category = input.category;
   if (input.screenshots !== undefined) patch.screenshots = input.screenshots;
   if (input.demo_blurb !== undefined) patch.demoBlurb = input.demo_blurb;
+  if (input.demo_url !== undefined) patch.demoUrl = input.demo_url;
+  if (input.demo_type !== undefined) patch.demoType = input.demo_type;
   if (input.external_url !== undefined) patch.externalUrl = input.external_url;
   if (input.status !== undefined) patch.status = input.status;
   if (input.price_cents !== undefined) patch.priceCents = input.price_cents;
