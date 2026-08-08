@@ -21,7 +21,10 @@ export default async function Home({
   return (
     <div className="relative">
       {/* Hero */}
-      <section className="glow-radial bg-grid">
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/HYDRAFORGE_LANDING_PAGE_IMAGE.jpg')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-slate-950/60" />
+        <div className="glow-radial bg-grid relative">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <div className="flex items-center gap-2 text-cyan-400">
             <Cpu className="h-5 w-5" />
@@ -53,6 +56,7 @@ export default async function Home({
               Sign up to list your product with a live demo →
             </Link>
           </div>
+        </div>
         </div>
       </section>
 
