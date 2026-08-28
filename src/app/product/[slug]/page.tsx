@@ -25,6 +25,8 @@ export default async function ProductPage({
   );
   const hasDemo =
     product.demo_type !== "none" && !!product.demo_url?.trim();
+  const demoUrl = product.demo_url ?? "";
+  const isLocalDemo = demoUrl.startsWith("/");
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -95,14 +97,16 @@ export default async function ProductPage({
             {hasDemo && product.demo_type === "iframe" && (
               <div className="mt-4">
                 <iframe
-                  src={product.demo_url!}
+                  src={demoUrl}
                   title={`${product.name} live demo`}
-                  className="h-[420px] w-full rounded-xl border border-slate-800 bg-white"
+                  className={`w-full rounded-xl border border-slate-800 bg-slate-950 ${
+                    isLocalDemo ? "h-[720px]" : "h-[420px] bg-white"
+                  }`}
                   loading="lazy"
                 />
                 <a
-                  href={product.demo_url!}
-                  target="_blank"
+                  href={demoUrl}
+                  target={isLocalDemo ? undefined : "_blank"}
                   rel="noopener noreferrer"
                   className="mt-2 inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300"
                 >
@@ -114,8 +118,8 @@ export default async function ProductPage({
             {hasDemo && product.demo_type === "link" && (
               <div className="mt-4">
                 <a
-                  href={product.demo_url!}
-                  target="_blank"
+                  href={demoUrl}
+                  target={isLocalDemo ? undefined : "_blank"}
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-lg border border-cyan-800/60 bg-cyan-950/40 px-4 py-2.5 text-sm font-medium text-cyan-300 transition-colors hover:bg-cyan-900/60"
                 >

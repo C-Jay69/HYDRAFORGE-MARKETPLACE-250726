@@ -40,10 +40,9 @@ const APPS: SeedApp[] = [
       "Full-stack AI publishing platform for authors: structured outlining, chapter-by-chapter AI approval, illustration generation, multi-format export, and audiobook generation.",
     category: "publishing",
     demoBlurb: "Write a book from outline to audiobook with the AI co-author.",
-    // NOTE: hydraskript.com must be made live (see Vercel deploy) for this to resolve.
-    // If the app blocks iframes, change demoType to "iframe" for an embedded demo.
-    demoUrl: "https://hydraskript.com",
-    demoType: "link",
+    // Embedded, self-contained demo lives inside this marketplace.
+    demoUrl: "/product/hydraskript/demo",
+    demoType: "iframe",
     demoCredentials: "demo@hydraforge.tech / demo1234",
     externalUrl: "https://hydraskript.com",
   },
