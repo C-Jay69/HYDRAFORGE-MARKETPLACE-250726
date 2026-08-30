@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Image as ImageIcon, Play } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Image as ImageIcon, Play } from "lucide-react";
 import type { Product } from "@/types";
 import { priceLabel } from "@/lib/format";
 import { CATEGORY_LABELS } from "@/lib/categories";
@@ -46,7 +46,7 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-5">
+      <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-lg font-semibold text-white">{product.name}</h3>
           <ArrowUpRight className="h-5 w-5 shrink-0 text-slate-500 transition-colors group-hover:text-cyan-400" />
@@ -54,22 +54,36 @@ export function ProductCard({ product }: { product: Product }) {
         <p className="line-clamp-2 text-sm text-slate-400">{product.tagline}</p>
 
         <div className="mt-auto flex items-center justify-between pt-2">
-          {localDemo ? (
-            <Link
-              href={product.demo_url!}
-              className="relative z-20 inline-flex w-fit items-center gap-1 text-sm font-semibold text-emerald-400 transition-colors hover:text-emerald-300"
-            >
-              <Play className="h-4 w-4" /> Launch demo
-            </Link>
-          ) : (
-            <span className="inline-flex w-fit items-center gap-1 text-sm font-medium text-cyan-400">
-              View demo
-              <ArrowUpRight className="h-4 w-4" />
-            </span>
-          )}
           {price && (
             <span className="text-sm font-semibold text-emerald-300">{price}</span>
           )}
+          {!hasDemo && !price && (
+            <span className="text-xs text-slate-500">No live demo</span>
+          )}
+        </div>
+
+        <div className="flex gap-2">
+          {!hasDemo && (
+            <span className="inline-flex w-full items-center justify-center gap-1 text-sm font-medium text-cyan-400">
+              <ArrowUpRight className="h-4 w-4" /> View demo
+            </span>
+          )}
+          {hasDemo && localDemo && (
+            <Link
+              href={product.demo_url!}
+              className="inline-flex w-full items-center justify-center gap-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:border-cyan-700 hover:text-cyan-300"
+            >
+              <Play className="h-4 w-4" /> Launch demo
+            </Link>
+          )}
+          <a
+            href={product.external_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-emerald-400"
+          >
+            <ExternalLink className="h-4 w-4" /> Go to site
+          </a>
         </div>
       </div>
     </div>
