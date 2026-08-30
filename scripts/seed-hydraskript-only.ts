@@ -19,6 +19,11 @@ const HYDRASKRIPT = {
   demoType: "link" as const,
   demoCredentials: "demo@hydraforge.tech / demo1234",
   externalUrl: "https://hydraskript.com",
+  screenshots: [
+    "/screenshots/hydraskript-demo1.png",
+    "/screenshots/hydraskript-screenshot1.png",
+    "/screenshots/hydraskript-screenshot2.png",
+  ],
 };
 
 async function main() {
@@ -35,7 +40,6 @@ async function main() {
 
   await db.insert(products).values({
     ...HYDRASKRIPT,
-    screenshots: [],
     status: "published",
     ownerId: null,
   });

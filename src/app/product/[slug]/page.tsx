@@ -62,19 +62,20 @@ export default async function ProductPage({
             <p className="mt-4 text-2xl font-bold text-white">{price}</p>
           )}
 
-          {/* Buy CTA — links to the seller's payment portal */}
-          <div className="mt-6 flex flex-col gap-3">
+          {/* Buy CTA — links to the seller's live site / payment portal */}
+          <div className="mt-2 flex flex-col gap-3">
             <a
               href={product.external_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-3.5 text-base font-semibold text-slate-950 transition-colors hover:bg-emerald-400"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-8 py-4.5 text-xl font-bold text-slate-950 shadow-xl shadow-emerald-500/25 transition-all duration-200 hover:scale-[1.02] hover:bg-emerald-400"
             >
-              {price ? `Buy now — ${price}` : "Buy now"}
+              {price ? `Buy now — ${price}` : "Go to site — Sign up & pay"}
               <ExternalLink className="h-5 w-5" />
             </a>
             <p className="text-center text-xs text-slate-500">
-              Purchases are completed on the seller&apos;s payment portal.
+              Purchases are completed on the seller&apos;s payment portal
+              (opens in a new tab).
             </p>
           </div>
 

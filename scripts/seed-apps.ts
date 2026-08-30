@@ -29,6 +29,7 @@ type SeedApp = {
   demoType: "iframe" | "link";
   demoCredentials: string;
   externalUrl: string;
+  screenshots?: string[];
 };
 
 const APPS: SeedApp[] = [
@@ -45,6 +46,11 @@ const APPS: SeedApp[] = [
     demoType: "link",
     demoCredentials: "demo@hydraforge.tech / demo1234",
     externalUrl: "https://hydraskript.com",
+    screenshots: [
+      "/screenshots/hydraskript-demo1.png",
+      "/screenshots/hydraskript-screenshot1.png",
+      "/screenshots/hydraskript-screenshot2.png",
+    ],
   },
   {
     slug: "relationshit",
@@ -123,7 +129,7 @@ async function main() {
       tagline: app.tagline,
       description: app.description,
       category: app.category,
-      screenshots: [],
+      screenshots: app.screenshots ?? [],
       demoBlurb: app.demoBlurb,
       demoUrl: app.demoUrl,
       demoType: app.demoType,

@@ -9,8 +9,12 @@
   "demo_url": "/product/hydraskript/demo",
   "demo_credentials": "demo@hydraforge.tech / demo1234",
   "external_url": "https://hydraskript.com",
+  "screenshots": [
+    "/screenshots/hydraskript-demo1.png",
+    "/screenshots/hydraskript-screenshot1.png",
+    "/screenshots/hydraskript-screenshot2.png"
+  ],
   "status": "published",
-  "screenshots": [],
   "price_cents": null,
   "currency": null,
   "billing_interval": null
